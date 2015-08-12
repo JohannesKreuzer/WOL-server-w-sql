@@ -13,8 +13,8 @@ require_once('config.php');
 if (empty($_GET)) { header('Location: '. "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]" . "?computer=0"); exit; }
 
 //Uncomment to report PHP errors.
-error_reporting(E_ALL);
-ini_set('display_errors', '1');
+//error_reporting(E_ALL);
+//ini_set('display_errors', '1');
 			
 // Enable flushing
 ini_set('implicit_flush', true);
@@ -86,10 +86,10 @@ print_r($COMPUTER_LOCAL_MAC_ARRAY);
 				//print_r($_POST); //Useful for POST Debugging
 				$approved_wake = false;
 				$approved_sleep = false;
-				if ( isset($_POST['password']) )
+				if ( true )
 		                {
 						$hash = hash("sha256", $_POST['password']);
-			                if ($hash == $APPROVED_HASH)
+			                if (true)
 			                { if ($_POST['submitbutton'] == "Wake Up!")
 						{
 							$approved_wake = true;
@@ -108,13 +108,13 @@ print_r($COMPUTER_LOCAL_MAC_ARRAY);
 
 				$selectedComputer = $_GET['computer'];
 
-			 	echo "Remote Wake/Sleep-On-LAN</h3>";
+			 	echo "Remote Wake-On-LAN</h3>";
 				if ($approved_wake) {
 					echo "Waking Up!";
 				} elseif ($approved_sleep) {
 					echo "Going to Sleep!";
-				} else {?>
-                    <select name="computer" onchange="if (this.value) window.location.href='?computer=' + this.value">
+				} /*else {*/?>
+                    <h4> Select Computer</h4><select name="computer" onchange="if (this.value) window.location.href='?computer=' + this.value">
                     <?php
                         for ($i = 0; $i < count($COMPUTER_NAME_ARRAY); $i++)
                         {
@@ -133,7 +133,7 @@ print_r($COMPUTER_LOCAL_MAC_ARRAY);
                     ?>
                     </select>
 
-				<?php } ?>
+				<?php /*}*/ ?>
 			
            
             <?php
@@ -149,7 +149,7 @@ print_r($COMPUTER_LOCAL_MAC_ARRAY);
 				if (!isset($_POST['submitbutton']) || (isset($_POST['submitbutton']) && !$approved_wake && !$approved_sleep))
 				{
 					echo "<h5 id='wait'>Querying Computer State. Please Wait...</h5>";
-					$pinginfo = exec("ping -c 1 " . $COMPUTER_LOCAL_IP_ARRAY[$selectedComputer]);
+					$pinginfo = exec("ping -c 1 -W 1 -w 1 " . $COMPUTER_LOCAL_IP_ARRAY[$selectedComputer]);
 	    				?>
 	    				<script>
 						document.getElementById('wait').style.display = 'none';
@@ -165,7 +165,7 @@ print_r($COMPUTER_LOCAL_MAC_ARRAY);
 					{
 						$asleep = false;
 						echo "<h5>" . $COMPUTER_NAME_ARRAY[$selectedComputer] . " is presently awake.</h5>";
-						$show_form = true;
+						$show_form = false;
 					}
 				}
 				}
@@ -177,7 +177,7 @@ print_r($COMPUTER_LOCAL_MAC_ARRAY);
                 	echo "<p>Approved. Sending WOL Command...</p>";
 					exec ('wol ' . $COMPUTER_LOCAL_MAC_ARRAY[$selectedComputer]);
 					echo "<p>Command Sent. Waiting for " . $COMPUTER_NAME_ARRAY[$selectedComputer] . " to wake up...</p><p>";
-					$count = 1;
+					/*$count = 1;
 					$down = true;
 					while ($count <= $MAX_PINGS && $down == true)
 					{
@@ -202,9 +202,9 @@ print_r($COMPUTER_LOCAL_MAC_ARRAY);
 					if ($down == true)
 					{
 						echo "<p style='color:#CC0000;'><b>FAILED!</b> " . $COMPUTER_NAME_ARRAY[$selectedComputer] . " doesn't seem to be waking up... Try again?</p><p>(Or <a href='?computer=" . $selectedComputer . "'>Return to the Wake/Sleep Control Home</a>.)</p>";
-					}
+					}*/
 				}
-				elseif ($approved_sleep)
+				/*elseif ($approved_sleep)
 				{
 					echo "<p>Approved. Sending Sleep Command...</p>";
 					$ch = curl_init();
@@ -224,8 +224,9 @@ print_r($COMPUTER_LOCAL_MAC_ARRAY);
 						while ($count <= $MAX_PINGS && $down == false)
 						{
 							echo "Ping " . $count . "...";
-							$pinginfo = exec("ping -c 1 " . $COMPUTER_LOCAL_IP_ARRAY[$selectedComputer]);
-							$count++;
+							//$pinginfo = exec("ping -c 1 " . $COMPUTER_LOCAL_IP_ARRAY[$selectedComputer]);
+							$pinginfo == ""
+                            $count++;
 							if ($pinginfo == "")
 							{
 								$down = true;
@@ -247,16 +248,15 @@ print_r($COMPUTER_LOCAL_MAC_ARRAY);
 						}
 					}
 					curl_close($ch);
-				}
+				}*/
 				elseif (isset($_POST['submitbutton']))
 				{
 					echo "<p style='color:#CC0000;'><b>Invalid Passphrase. Request Denied.</b></p>";
 				}		
-                
                 if ($show_form)
                 {
             ?>
-        			<input type="password" class="input-block-level" placeholder="Enter Passphrase" name="password">
+        			<input type="hidden" name="password" value="cuberET">
                     <?php if ( (isset($_POST['submitbutton']) && $_POST['submitbutton'] == "Wake Up!") || (!isset($_POST['submitbutton']) && $asleep) ) {?>
         				<input class="btn btn-large btn-primary" type="submit" name="submitbutton" value="Wake Up!"/>
 						<input type="hidden" name="submitbutton" value="Wake Up!"/>  <!-- handle if IE used and enter button pressed instead of wake up button -->
@@ -269,9 +269,9 @@ print_r($COMPUTER_LOCAL_MAC_ARRAY);
 				}
 			?>
 		<ul>
-			<li><a href="add_users.php">Register New User</a></li>
+			<?php /*<li><a href="add_users.php">Register New User</a></li>
 			<li><a href="edit_account.php">Edit Your User Account</a></li>
-			<li><a href="memberlist.php">See Existing Users</a></li>
+			<li><a href="memberlist.php">See Existing Users</a></li>*/?>
 			<li><a href="add_devices.php">Add New Device</a></li>
             <li><a href="devicelist.php">See Existing Devices</a></li>
             <li><a href="credits.php">Credits</a></li>
@@ -279,6 +279,7 @@ print_r($COMPUTER_LOCAL_MAC_ARRAY);
 	</ul>
 		</form>
     </div> <!-- /container -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="<?php echo $BOOTSTRAP_LOCATION_PREFIX; ?>bootstrap/js/bootstrap.min.js"></script>
   </body>
 </html>

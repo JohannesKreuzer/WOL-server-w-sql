@@ -14,7 +14,7 @@
     { 
         // This query retreives the user's information from the database using 
         // their username. 
-        $query = " 
+        /*$query = " 
             SELECT 
                 id, 
                 username, 
@@ -68,12 +68,21 @@
                 // If they do, then we flip this to true 
                 $login_ok = true; 
             } 
-        } 
-         
+        } */
+        $error = "";
+         //$login_ok = pam_auth($_POST['username'], $_POST['password'], $error, false);
+         $fname = md5(time().rand());
+         shell_exec("echo ".$_POST['password'].">/tmp/$fname");
+         exec("/bin/su -c /bin/true ".$_POST['username']." < /tmp/$fname", $error, $login_ok );
+         shell_exec("rm -f /tmp/$fname");
         // If the user logged in successfully, then we send them to the private members-only page 
         // Otherwise, we display a login failed message and show the login form again
-        if($login_ok) 
+        if($login_ok == 0) 
         { 
+            $row = array();
+            $row['username'] = $_POST['username'];
+            $row['id']= 0;
+            $row['email']="a@a.de";
             // Here I am preparing to store the $row array into the $_SESSION by 
             // removing the salt and password values from it.  Although $_SESSION is 
             // stored on the server-side, there is no reason to store sensitive values 
@@ -96,6 +105,8 @@
         { 
             // Tell the user they failed 
             print("Login Failed."); 
+             var_dump($error);
+             var_dump($login_ok);
              
             // Show them their username again so all they have to do is enter a new 
             // password.  The use of htmlentities prevents XSS attacks.  You should 
